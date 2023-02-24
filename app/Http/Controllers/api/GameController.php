@@ -23,7 +23,7 @@ class GameController extends Controller
             $game->victory = false;
         }
 
-        $game = $game->save();
+        $game->save();
 
         return response()->json([
             'message' => 'Game created succesfully.',
