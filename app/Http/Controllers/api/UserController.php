@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return response(User::all());
+        return response(['users' => User::all()]);
     }
 
     /**
@@ -95,16 +95,6 @@ class UserController extends Controller
             ]);
         } else {
             return response()->json(['message' => 'Nickname cannot be updated because it is already taken.']);
-        }
-    }
-
-    public function succesRate(){
-        $victories = $this->games()->where('victory' == true);
-
-        if ($victories == 0) {
-            $succesRate = 0;
-        } else {
-            $succesRate = ($victories / $this->games()->count()) * 100;
         }
     }
 }
