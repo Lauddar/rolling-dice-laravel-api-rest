@@ -49,14 +49,12 @@ class UserController extends Controller
                 $nickname = 'anonymous';
             }
 
-            $succesRate = 0;
-
             // Create a new user.
             $user = User::create([
                 'nickname' => $nickname,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'succes_rate' => $succesRate,
+                'succes_rate' => 0,
             ]);
 
             // Response
