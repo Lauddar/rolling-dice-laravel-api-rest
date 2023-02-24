@@ -24,4 +24,5 @@ Route::middleware('auth:api')->prefix('players')->group(function () {
     Route::post('/', [UserController::class, 'store']);
     Route::post('/{user}', [UserController::class, 'update']);
     Route::post('/{user}/games', [GameController::class, 'play']);
+    Route::delete('/{user}/games', [GameController::class, 'delete']);
 });

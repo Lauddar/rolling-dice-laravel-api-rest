@@ -30,4 +30,12 @@ class GameController extends Controller
             'game' => $game
         ], Response::HTTP_CREATED);
     }
+
+    public function delete(User $user) {
+        $user->games()->delete();
+
+        return response()->json([
+            'message' => 'All games deleted succesfully.',
+        ]);
+    }
 }
