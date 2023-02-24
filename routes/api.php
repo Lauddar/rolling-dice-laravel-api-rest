@@ -19,5 +19,7 @@ use App\Http\Controllers\api\LoginController;
 Route::post('/login', [LoginController::class, 'login']);
 
 Route::middleware('auth:api')->prefix('players')->group(function () {
-    Route::get('/', [UserController::class, 'all']);
+    Route::get('/', [UserController::class, 'index']);
+    Route::post('/', [UserController::class, 'store']);
+    Route::post('/{user}', [UserController::class, 'update']);
 });
