@@ -18,11 +18,12 @@ use App\Http\Controllers\api\GameController;
 */
 
 Route::post('/login', [LoginController::class, 'login']);
+Route::post('/players', [UserController::class, 'store']);
 
 Route::middleware('auth:api')->prefix('players')->group(function () {
     Route::get('/', [UserController::class, 'index']);
     Route::post('/', [UserController::class, 'store']);
-    Route::post('/{user}', [UserController::class, 'update']);
+    Route::put('/{user}', [UserController::class, 'update']);
     Route::post('/{user}/games', [GameController::class, 'play']);
     Route::delete('/{user}/games', [GameController::class, 'delete']);
 });
