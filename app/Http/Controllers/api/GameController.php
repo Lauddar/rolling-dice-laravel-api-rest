@@ -12,6 +12,17 @@ use Illuminate\Http\Request;
 class GameController extends Controller
 {
     /**
+     * Get a list of all users' games.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(User $user)
+    {
+        return response(['games' => $user->games->all()]);
+    }
+
+
+    /**
      * Starts a new game for the given user.
      *
      * @param User $user
