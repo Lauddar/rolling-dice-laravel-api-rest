@@ -49,11 +49,14 @@ class UserController extends Controller
                 $nickname = 'anonymous';
             }
 
+            $succesRate = 0;
+
             // Create a new user.
             $user = User::create([
                 'nickname' => $nickname,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'succes_rate' => $succesRate,
             ]);
 
             // Response
@@ -94,6 +97,16 @@ class UserController extends Controller
             ]);
         } else {
             return response()->json(['message' => 'Nickname cannot be updated because it is already taken.']);
+        }
+    }
+
+    public function succesRate(){
+        $victories = $this->games()->where('victory' == true);
+
+        if ($victories == 0) {
+            $succesRate = 0;
+        } else {
+            $succesRate = ($victories / $this->games()->count()) * 100;
         }
     }
 }
