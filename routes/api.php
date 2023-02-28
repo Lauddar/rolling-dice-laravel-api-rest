@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\LoginController;
 use App\Http\Controllers\api\GameController;
+use App\Http\Controllers\api\RankController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,4 +28,7 @@ Route::middleware('auth:api')->prefix('players')->group(function () {
     Route::post('/{user}/games', [GameController::class, 'play']);
     Route::delete('/{user}/games', [GameController::class, 'delete']);
     Route::get('/{user}/games', [GameController::class, 'index']);
+    Route::get('/ranking', [RankController::class, 'rank']);
+    Route::get('/ranking/loser', [RankController::class, 'loser']);
+    Route::get('/ranking/winner', [RankController::class, 'winner']);
 });
