@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return response(User::all());
+        return response(['users' => User::all()]);
     }
 
     /**
@@ -54,6 +54,7 @@ class UserController extends Controller
                 'nickname' => $nickname,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'succes_rate' => 0,
             ]);
 
             // Response
