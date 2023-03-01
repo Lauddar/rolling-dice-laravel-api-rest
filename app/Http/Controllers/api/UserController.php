@@ -42,7 +42,7 @@ class UserController extends Controller
             // Check if nickname already exists
             if (isset($request->nickname)) {
                 if (User::where('nickname', $request->nickname)->first()) {
-                    return response()->json(['message' => 'Operation failed. This nickname is already taken.']);
+                    return response()->json(['message' => 'Operation failed. This nickname is already taken.'], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
                 $nickname = $request->nickname;
             } else {

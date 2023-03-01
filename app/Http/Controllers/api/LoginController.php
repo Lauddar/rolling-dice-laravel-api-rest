@@ -11,13 +11,17 @@ class LoginController extends Controller
 {
     use HasApiTokens;
 
-    public function login(Request $request) {
+    /**
+     * @method POST
+     */
+    public function login(Request $request)
+    {
         $login = $request->validate([
             'email' => 'required|string',
             'password' => 'required|string'
         ]);
 
-        $credentials = $request->only('email','password');
+        $credentials = $request->only('email', 'password');
 
         if (!Auth::attempt($credentials)) {
             return response(['message' => 'Invalid login credentials.'], 401);
@@ -28,4 +32,3 @@ class LoginController extends Controller
         return response(['user' => Auth::user(), 'acces_token' => $accesToken]);
     }
 }
-

@@ -18,12 +18,12 @@ use App\Http\Controllers\api\RankController;
 |
 */
 
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/players', [UserController::class, 'store']);
+Route::post('/login', [LoginController::class, 'login'])->name('login');
+Route::post('/players', [UserController::class, 'store'])->name('register');
 
 //Player permission routes
 Route::middleware('auth:api')->prefix('players')->group(function () {
-    Route::post('/', [UserController::class, 'store']);
+    // Route::post('/', [UserController::class, 'store']);
     Route::put('/{user}', [UserController::class, 'update']);
     Route::post('/{user}/games', [GameController::class, 'play']);
     Route::delete('/{user}/games', [GameController::class, 'delete']);
