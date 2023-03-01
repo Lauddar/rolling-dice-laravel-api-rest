@@ -33,7 +33,7 @@ class GameController extends Controller
     {
         // Create user's success rate if not exists.
         if (is_null(Player::where('user_id', $user->id)->first())) {
-            $user->player->create(['success_rate' => 0.00]);
+            $user->player()->create(['success_rate' => 0.00]);
         }
 
         // Create a new game for the user.
