@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Laravel\Sanctum\Sanctum;
@@ -10,6 +11,8 @@ use Tests\TestCase;
 
 class UserTest extends TestCase
 {
+    use DatabaseTransactions;
+
     /**
      * @test
      * Valid login
@@ -24,12 +27,10 @@ class UserTest extends TestCase
         ]);
 
         $response->assertOk();
-
-        $user->delete();
     }
 
     /** @test */
-    public function testAccesToken()
+    public function testLoginAccesToken()
     {
         $user = User::factory()->create();
 
@@ -41,11 +42,9 @@ class UserTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure(['user', 'acces_token']);
         $this->assertNotNull($response['acces_token']);
-
-        $user->delete();
     }
 
-    public function testInvalidEmail()
+    public function testLoginInvalidEmail()
     {
         $user = User::factory()->create();
 
@@ -55,11 +54,9 @@ class UserTest extends TestCase
         ]);
 
         $response->assertStatus(401); // Returns unauthorized
-
-        $user->delete();
     }
 
-    public function testInvalidPassword()
+    public function testLoginInvalidPassword()
     {
         $user = User::factory()->create();
 
@@ -69,8 +66,6 @@ class UserTest extends TestCase
         ]);
 
         $response->assertStatus(401); // Returns unauthorized
-
-        $user->delete();
     }
 
     /**
@@ -80,8 +75,6 @@ class UserTest extends TestCase
      */
     public function testStore()
     {
-        $this->withoutExceptionHandling();
-
         $user = User::factory()->makeOne();
 
         $userData = [
@@ -105,11 +98,9 @@ class UserTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => $userData['email'],
         ]);
-
-        User::where('email', $userData['email'])->delete();
     }
 
-    public function testAnonymousNickNameIfNull()
+    public function testStoreAnonymousNickNameIfNull()
     {
         $this->withoutExceptionHandling();
 
@@ -155,11 +146,9 @@ class UserTest extends TestCase
             ->assertJson([
                 'message' => 'The email is already in use',
             ]);
-
-        User::where('email', $userData['email'])->delete();
     }
 
-    
+
     public function testStoreInvalidEmailFormat()
     {
         $userData = [
@@ -205,6 +194,73 @@ class UserTest extends TestCase
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJson([
                 'message' => 'The password confirmation does not match.'
+            ]);
+    }
+
+    public function testUpdateWithValidData()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->accessToken;
+        $newNickname = 'newNickname';
+
+        $response = $this->actingAs($user)->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->put("/api/players/{$user->id}", ['nickname' => $newNickname]);
+
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJson([
+                'message' => 'Nickname updated succesfully.',
+                'user' => [
+                    'nickname' => $newNickname
+                ]
+            ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'nickname' => $newNickname
+        ]);
+    }
+
+    public function testUpdateEmptyField()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->accessToken;
+        $oldNickname = $user->nickname;
+        $newNickname = '';
+
+        $response = $this->actingAs($user)->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->put("/api/players/{$user->id}", ['nickname' => $newNickname]);
+
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJson([
+                'message' => 'Operation failed.',
+                'user' => [
+                    'nickname' => $oldNickname,
+                ]
+            ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'nickname' => $oldNickname
+        ]);
+    }
+
+    public function testUpdateDuplicatedNickname()
+    {
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        $newNickname = $user1->nickname;
+
+        $token = $user2->createToken('TestToken')->accessToken;
+
+        $response = $this->actingAs($user2)->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->put("/api/players/{$user2->id}", ['nickname' => $newNickname]);
+
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJson([
+                'message' => 'Nickname cannot be updated because it is already taken.',
             ]);
     }
 }
