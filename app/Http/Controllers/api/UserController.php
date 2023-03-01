@@ -91,7 +91,7 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Nickname updated succesfully.',
                 'user' => $user
-            ]);
+            ], Response::HTTP_OK);
         } else {
             return response()->json(['message' => 'Nickname cannot be updated because it is already taken.']);
         }
