@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('games', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('player_id');
             $table->integer('first_dice');
             $table->integer('second_dice');
             $table->boolean('victory');
             $table->timestamps();
     
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('player_id')->references('id')->on('players')->onDelete('cascade');
         });
     }
 
