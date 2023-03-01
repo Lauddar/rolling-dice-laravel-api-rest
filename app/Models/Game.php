@@ -12,7 +12,7 @@ class Game extends Model
     /**
      * Get the user that owns the game.
      */
-    public function user()
+    public function player()
     {
         return $this->belongsTo(User::class);
     }

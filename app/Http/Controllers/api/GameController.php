@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Game;
+use App\Models\Player;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Response;
@@ -30,23 +31,27 @@ class GameController extends Controller
      */
     public function play(User $user)
     {
+        // Create user's success rate if not exists.
+        if (is_null(Player::where('user_id', $user->id)->first())) {
+            $user->player->create(['success_rate' => 0.00]);
+        }
+
         // Create a new game for the user.
         $game = new Game;
-        $game->user_id = $user->id;
+        $game->player_id = $user->player->id;
 
-        // Roll de dice
-        $this->throwDices($game);
+        $this->throwDice($game);
 
         // Save the game to the database.
         $game->save();
 
-        // Update the user's success rate.
-        $user->succesRate();
+        $user->player->updateSuccessRate();
 
         // Response
         return response()->json([
             'message' => 'Game created succesfully.',
-            'game' => $game
+            'game' => $game,
+            'success_rate' => $user->player->success_rate,
         ], Response::HTTP_CREATED);
     }
 
@@ -71,7 +76,7 @@ class GameController extends Controller
      * @param Game $game
      * The game in which the dice are being rolled.
      */
-    public function throwDices(Game $game)
+    public function throwDice(Game $game)
     {
         $game->first_dice = rand(1, 6);
         $game->second_dice = rand(1, 6);

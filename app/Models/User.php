@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasRoles, HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -43,24 +44,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * Get the games for the user.
-     */
-    public function games()
+
+    public function player()
     {
-        return $this->hasMany(Game::class);
-    }
-
-    public function succesRate(){
-        $victories = $this->games()->where('victory', true)->count();
-        $totalGames = $this->games()->count();
-
-        if($victories > 0) {
-            $succesRate = ($victories / $totalGames) * 100;
-        } else {
-            $succesRate = 0;
-        }
-
-        $this->update(['succes_rate' => $succesRate]);
+        return $this->hasOne(Player::class);
     }
 }
