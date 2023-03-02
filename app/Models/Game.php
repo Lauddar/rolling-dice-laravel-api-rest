@@ -14,7 +14,7 @@ class Game extends Model
     ];
 
     /**
-     * Get the user that owns the game.
+     * One to many relationship.
      */
     public function user()
     {

@@ -29,7 +29,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate data.
+        // Input validation
         try {
             $validatedData  = $request->validate([
                 'email' => 'required|string|email|max:255|unique:users',
@@ -79,6 +79,7 @@ class UserController extends Controller
         // Get the new nickname from the request
         $nickname = $request->input('nickname');
 
+        // Input validation not null.
         if (!isset($nickname)) {
             return response()->json([
                 'message' => 'Operation failed.',
@@ -86,7 +87,7 @@ class UserController extends Controller
             ]);
         }
 
-        // If the nickname is not set, return an error response
+        // If the nickname is not set, return an error response, else, update nickname.
         if (!User::where('nickname', $nickname)->first()) {
             $user->update(['nickname' => $nickname]);
             return response()->json([
