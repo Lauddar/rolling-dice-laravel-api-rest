@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -262,5 +262,21 @@ class UserTest extends TestCase
             ->assertJson([
                 'message' => 'Nickname cannot be updated because it is already taken.',
             ]);
+    }
+
+    public function testIndex()
+    {
+        $user = User::factory()->create()->assignRole(['Admin']);
+        $token = $user->createToken('TestToken')->accessToken;
+        
+        User::factory()->count(3)->create(['success_rate' => fake()->randomFloat(2, 0, 100)]);
+
+        $players = User::count();
+
+        $response = $this->actingAs($user)->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get('/api/players');
+
+        $response->assertStatus(Response::HTTP_OK)->assertJsonCount($players, 'players')->assertJsonStructure(['players']);
     }
 }
