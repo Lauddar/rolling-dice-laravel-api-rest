@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return response(['users' => User::all()]);
+        return response(['players' => User::all()]);
     }
 
     /**
@@ -42,7 +42,7 @@ class UserController extends Controller
             // Check if nickname already exists
             if (isset($request->nickname)) {
                 if (User::where('nickname', $request->nickname)->first()) {
-                    return response()->json(['message' => 'Operation failed. This nickname is already taken.']);
+                    return response()->json(['message' => 'Operation failed. This nickname is already taken.'], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
                 $nickname = $request->nickname;
             } else {
@@ -53,7 +53,8 @@ class UserController extends Controller
             $user = User::create([
                 'nickname' => $nickname,
                 'email' => $request->email,
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'success_rate' => 0.00,
             ]);
 
             // Response
@@ -91,7 +92,7 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Nickname updated succesfully.',
                 'user' => $user
-            ]);
+            ], Response::HTTP_OK);
         } else {
             return response()->json(['message' => 'Nickname cannot be updated because it is already taken.']);
         }

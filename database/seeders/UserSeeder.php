@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
                 'nickname' => 'Test Admin User',
                 'email' => 'admin@test.com',
                 'password' => '$2y$10$/4OC8ZMqeCTMzb9RhRca1evVw2YDPP1wuIGWP58NqADCyp.0G.U.W',
+                'success_rate' => 0.00,
             ],
         )->assignRole(['Admin']);
 
@@ -26,6 +27,7 @@ class UserSeeder extends Seeder
                 'nickname' => 'Test Player User',
                 'email' => 'player@test.com',
                 'password' => '$2y$10$/4OC8ZMqeCTMzb9RhRca1evVw2YDPP1wuIGWP58NqADCyp.0G.U.W',
+                'success_rate' => 0.00,
             ]
         )->assignRole(['Player']);
     }

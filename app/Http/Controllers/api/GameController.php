@@ -4,7 +4,6 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Game;
-use App\Models\Player;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Response;
@@ -19,7 +18,7 @@ class GameController extends Controller
      */
     public function index(User $user)
     {
-        return response(['games' => $user->games->all()]);
+        return response(['games' => $user->games->all(), 'sucess_rate' => $user->succes_rate]);
     }
 
 
@@ -31,27 +30,22 @@ class GameController extends Controller
      */
     public function play(User $user)
     {
-        // Create user's success rate if not exists.
-        if (is_null(Player::where('user_id', $user->id)->first())) {
-            $user->player->create(['success_rate' => 0.00]);
-        }
-
         // Create a new game for the user.
         $game = new Game;
-        $game->player_id = $user->player->id;
+        $game->user_id = $user->id;
 
         $this->throwDice($game);
 
         // Save the game to the database.
         $game->save();
 
-        $user->player->updateSuccessRate();
+        $user->updateSuccessRate();
 
         // Response
         return response()->json([
-            'message' => 'Game created succesfully.',
+            'message' => 'Game created successfully.',
             'game' => $game,
-            'success_rate' => $user->player->success_rate,
+            'success_rate' => $user->success_rate,
         ], Response::HTTP_CREATED);
     }
 
@@ -82,10 +76,6 @@ class GameController extends Controller
         $game->second_dice = rand(1, 6);
 
         // Decides if player wins or loses
-        if (($game->first_dice + $game->second_dice) == 7) {
-            $game->victory = true;
-        } else {
-            $game->victory = false;
-        }
+        $game->victory = ($game->firstDice + $game->secondDice == 7);
     }
 }

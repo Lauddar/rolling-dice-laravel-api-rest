@@ -16,7 +16,8 @@ class RankController extends Controller
      */
     public function rank()
     {
-        return response()->json(['averageSuccesRate' => Rank::averageSuccesRate()]);
+        $rank = new Rank;
+        return response()->json(['averageSuccessRate' => $rank->averageSuccesRate()]);
     }
 
     /**
@@ -26,8 +27,7 @@ class RankController extends Controller
      */
     public function loser()
     {
-
-        $loser = User::orderBy('succes_rate')->first();
+        $loser = User::whereHas('games')->with('games')->orderBy('success_rate')->first();
 
         return response()->json(['loser' => $loser]);
     }
@@ -39,28 +39,8 @@ class RankController extends Controller
      */
     public function winner()
     {
+        $winner = User::whereHas('games')->with('games')->orderBy('success_rate', 'desc')->first();
 
-        $winner = User::orderBy('succes_rate', 'desc')->first();
-
-        return response()->json(['loser' => $winner]);
-    }
-
-    /**
-     * Calculate the average success rate for all users.
-     *
-     * @return float The average success rate.
-     */
-    public static function averageSuccesRate()
-    {
-        $succesRates = User::pluck('succes_rate');
-        $averageSuccesRate = 0;
-
-        foreach ($succesRates as $succesRate) {
-            $averageSuccesRate +=  $succesRate;
-        }
-
-        $averageSuccesRate = $averageSuccesRate / $succesRates->count();
-
-        return $averageSuccesRate;
+        return response()->json(['winner' => $winner]);
     }
 }

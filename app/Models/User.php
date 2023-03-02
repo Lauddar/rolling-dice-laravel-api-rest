@@ -22,7 +22,7 @@ class User extends Authenticatable
         'nickname',
         'email',
         'password',
-        'succes_rate',
+        'success_rate',
     ];
 
     /**
@@ -44,9 +44,33 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-
-    public function player()
+    /**
+     * Get the games for the user.
+     */
+    public function games()
     {
-        return $this->hasOne(Player::class);
+        return $this->hasMany(Game::class);
+    }
+
+    public function updateSuccessRate()
+    {
+        $successRate = $this->calculateSuccessRate();
+        $formattedSuccessRate = number_format((float)$successRate, 2, '.', '');
+
+        $this->update(['success_rate' => $formattedSuccessRate]);
+    }
+
+    public function calculateSuccessRate()
+    {
+        $victories = $this->games()->where('victory', 1)->count();
+        $totalGames = $this->games()->count();
+
+        if ($victories > 0) {
+            $successRate = ($victories / $totalGames) * 100;
+        } else {
+            $successRate = 0.00;
+        }
+
+        return $successRate;
     }
 }
