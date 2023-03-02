@@ -305,6 +305,7 @@ class UserTest extends TestCase
                 'message' => 'Nickname cannot be updated because it is already taken.',
             ]);
     }
+
     /**
      * @test
      * Test that index() method returns all users only for Admin role.
@@ -325,11 +326,15 @@ class UserTest extends TestCase
         $response->assertStatus(Response::HTTP_OK)->assertJsonCount($players, 'players')->assertJsonStructure(['players']);
     }
 
+    /**
+     * @test
+     * Test that index() method is forbidden for Player role.
+     */
     public function testPlayersIndexPlayer()
     {
         $user = User::factory()->create()->assignRole(['Player']);
         $token = $user->createToken('TestToken')->accessToken;
-        
+
         User::factory()->count(3)->create(['success_rate' => fake()->randomFloat(2, 0, 100)]);
 
         $players = User::count();

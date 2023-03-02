@@ -12,6 +12,10 @@ class GameTest extends TestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * @test
+     * Test a player's game with method play().
+     */
     public function testPlay()
     {
         $user = User::factory()->create();
@@ -23,11 +27,9 @@ class GameTest extends TestCase
 
         $response->assertStatus(Response::HTTP_CREATED);
 
-        // Check that the game was created for the user
         $game = Game::where('user_id', $user->id)->first();
         $this->assertNotNull($game);
 
-        // Check the response data
         $response->assertJson([
             'message' => 'Game created successfully.',
             'game' => $game->toArray(),
@@ -35,6 +37,10 @@ class GameTest extends TestCase
         ]);
     }
 
+    /**
+     * @test
+     * Test that method play() is forbidden without token .
+     */
     public function testWithoutToken()
     {
         $user = User::factory()->create();
@@ -45,6 +51,10 @@ class GameTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
     }
 
+    /**
+     * @test
+     * Test that method play() is forbidden with an invalid token .
+     */
     public function testWithInvalidToken()
     {
         $user = User::factory()->create();
@@ -57,6 +67,10 @@ class GameTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
     }
 
+    /**
+     * @test
+     * Test that delete() method deletes all user's games.
+     */
     public function testDelete()
     {
         $user = User::factory()->create();
@@ -76,6 +90,10 @@ class GameTest extends TestCase
         $this->assertEquals(0, $user->games()->count());
     }
 
+    /**
+     * @test
+     * Test index() method for all user's games.
+     */
     public function testGamesIndex()
     {
         $user = User::factory()->create();

@@ -15,6 +15,10 @@ class RankTest extends TestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * @test
+     * Test rank() returns the average succes rate from all players only for Admin role.
+     */
     public function testRankAdmin()
     {
         $user = User::factory()->create()->assignRole(['Admin']);
@@ -31,14 +35,18 @@ class RankTest extends TestCase
         $response = $this->actingAs($user)->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->get('/api/players/ranking');
-    
+
         $response->assertOk();
-    
+
         $response->assertJson([
-                'averageSuccessRate' => 50.93,
-            ]);
+            'averageSuccessRate' => 50.93,
+        ]);
     }
 
+    /**
+     * @test
+     * Test rank() is forbidden for Player role.
+     */
     public function testRankPlayer()
     {
         $user = User::factory()->create()->assignRole(['Player']);
@@ -51,6 +59,10 @@ class RankTest extends TestCase
         $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
+    /**
+     * @test
+     * Test loser() gives the player with lower succes rate, only for Admin role.
+     */
     public function testLoserAdmin()
     {
         $user = User::factory()->create()->assignRole(['Admin']);
@@ -69,14 +81,18 @@ class RankTest extends TestCase
         $response = $this->actingAs($user)->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->get('/api/players/ranking/loser');
-    
+
         $response->assertOk();
-    
+
         $response->assertJson([
-                'loser' => $loser->toArray(),
-            ]);
+            'loser' => $loser->toArray(),
+        ]);
     }
 
+    /**
+     * @test
+     * Test winner() gives the player with higher succes rate, only for Admin role.
+     */
     public function testWinnerAdmin()
     {
         $user = User::factory()->create()->assignRole(['Admin']);
@@ -95,14 +111,11 @@ class RankTest extends TestCase
         $response = $this->actingAs($user)->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->get('/api/players/ranking/winner');
-    
+
         $response->assertOk();
-    
+
         $response->assertJson([
-                'winner' => $winner->toArray(),
-            ]);
+            'winner' => $winner->toArray(),
+        ]);
     }
-
-
-
 }
