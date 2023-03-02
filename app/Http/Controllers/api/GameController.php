@@ -17,7 +17,7 @@ class GameController extends Controller
      */
     public function index(User $user)
     {
-        return response(['games' => $user->games->all(), 'sucess_rate' => $user->succes_rate]);
+        return response(['games' => $user->games->all(), 'sucess_rate' => $user->success_rate]);
     }
 
 
@@ -55,6 +55,8 @@ class GameController extends Controller
     public function delete(User $user)
     {
         $user->games()->delete();
+        
+        $user->updateSuccessRate();
 
         return response()->json([
             'message' => 'All games deleted succesfully.',
