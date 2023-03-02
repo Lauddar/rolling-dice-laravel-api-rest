@@ -9,10 +9,14 @@ class Game extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'user_id'
+    ];
+
     /**
      * Get the user that owns the game.
      */
-    public function player()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
