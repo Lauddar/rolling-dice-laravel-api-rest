@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Game;
-use App\Models\Player;
 use App\Models\User;
 use Illuminate\Http\Response;
 use Tests\TestCase;
@@ -58,7 +57,26 @@ class GameTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
     }
 
-    public function testIndex()
+    public function testDelete()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->accessToken;
+
+        $games = Game::factory()->count(5)->create(['user_id' => $user->id]);
+        $this->assertEquals(5, $user->games()->count());
+
+        $response = $this->actingAs($user)->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->delete("/api/players/{$user->id}/games");
+
+        $response->assertOk();
+
+        $this->assertEquals(0, $user->games()->count());
+
+        $this->assertEquals(0, $user->games()->count());
+    }
+
+    public function testGamesIndex()
     {
         $user = User::factory()->create();
         $games = Game::factory()->count(3)->create(['user_id' => $user->id]);
