@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->integer('first_dice');
             $table->integer('second_dice');
-            $table->boolean('victory');
+            $table->tinyInteger('victory');
             $table->timestamps();
         });
     }

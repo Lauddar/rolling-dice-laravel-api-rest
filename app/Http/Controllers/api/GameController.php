@@ -72,6 +72,6 @@ class GameController extends Controller
         $game->second_dice = rand(1, 6);
 
         // Decides if player wins or loses
-        $game->victory = ($game->firstDice + $game->secondDice == 7);
+        $game->victory = (($game->first_dice + $game->second_dice) == 7);
     }
 }
