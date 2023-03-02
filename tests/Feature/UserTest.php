@@ -264,7 +264,7 @@ class UserTest extends TestCase
             ]);
     }
 
-    public function testIndex()
+    public function testPlayersIndexAdmin()
     {
         $user = User::factory()->create()->assignRole(['Admin']);
         $token = $user->createToken('TestToken')->accessToken;
@@ -278,5 +278,21 @@ class UserTest extends TestCase
         ])->get('/api/players');
 
         $response->assertStatus(Response::HTTP_OK)->assertJsonCount($players, 'players')->assertJsonStructure(['players']);
+    }
+
+    public function testPlayersIndexPlayer()
+    {
+        $user = User::factory()->create()->assignRole(['Player']);
+        $token = $user->createToken('TestToken')->accessToken;
+        
+        User::factory()->count(3)->create(['success_rate' => fake()->randomFloat(2, 0, 100)]);
+
+        $players = User::count();
+
+        $response = $this->actingAs($user)->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get('/api/players');
+
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 }
