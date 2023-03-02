@@ -5,7 +5,6 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Rank;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class RankController extends Controller
 {

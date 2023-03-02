@@ -45,13 +45,16 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the games for the user.
+     * One to many relationship.
      */
     public function games()
     {
         return $this->hasMany(Game::class);
     }
 
+    /**
+     * Updates the user's success rate in the database with formatting.
+     */
     public function updateSuccessRate()
     {
         $successRate = $this->calculateSuccessRate();
@@ -60,11 +63,19 @@ class User extends Authenticatable
         $this->update(['success_rate' => $formattedSuccessRate]);
     }
 
+    /**
+     * Calculates the success rate for the user based on their game history.
+     *
+     * @return float The user's success rate as a percentage.
+     */
     public function calculateSuccessRate()
     {
+        // Get the parameters for the operation
         $victories = $this->games()->where('victory', 1)->count();
         $totalGames = $this->games()->count();
 
+
+        // Calculate the success rate as a percentage
         if ($victories > 0) {
             $successRate = ($victories / $totalGames) * 100;
         } else {

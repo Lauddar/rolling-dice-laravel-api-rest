@@ -15,7 +15,7 @@ class UserTest extends TestCase
 
     /**
      * @test
-     * Valid login
+     * Test login route
      */
     public function testLogin()
     {
@@ -29,7 +29,10 @@ class UserTest extends TestCase
         $response->assertOk();
     }
 
-    /** @test */
+    /**
+     * @test
+     * Test that login returns a valid acces token for the user.
+     */
     public function testLoginAccesToken()
     {
         $user = User::factory()->create();
@@ -39,11 +42,15 @@ class UserTest extends TestCase
             'password' => 'password'
         ]);
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonStructure(['user', 'acces_token']);
         $this->assertNotNull($response['acces_token']);
     }
 
+    /**
+     * @test
+     * Test a login with an invalid email.
+     */
     public function testLoginInvalidEmail()
     {
         $user = User::factory()->create();
@@ -53,9 +60,13 @@ class UserTest extends TestCase
             'password' => 'password'
         ]);
 
-        $response->assertStatus(401); // Returns unauthorized
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
+    /**
+     * @test
+     * Test a login with an invalid pasword.
+     */
     public function testLoginInvalidPassword()
     {
         $user = User::factory()->create();
@@ -65,13 +76,12 @@ class UserTest extends TestCase
             'password' => 'invalidpassword'
         ]);
 
-        $response->assertStatus(401); // Returns unauthorized
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     /**
+     * @test
      * Test if the store() method creates a new user.
-     *
-     * @return void
      */
     public function testStore()
     {
@@ -100,6 +110,10 @@ class UserTest extends TestCase
         ]);
     }
 
+    /**
+     * @test
+     * Test if the store() method creates a new user with 'anonymus' name if not given.
+     */
     public function testStoreAnonymousNickNameIfNull()
     {
         $this->withoutExceptionHandling();
@@ -130,6 +144,10 @@ class UserTest extends TestCase
         User::where('email', $userData['email'])->delete();
     }
 
+    /**
+     * @test
+     * Test if the store() method validates that email must be unique.
+     */
     public function testStoreIfEmailTaken()
     {
         $user = User::factory()->create();
@@ -148,7 +166,10 @@ class UserTest extends TestCase
             ]);
     }
 
-
+    /**
+     * @test
+     * Test if the store() method validates email format.
+     */
     public function testStoreInvalidEmailFormat()
     {
         $userData = [
@@ -165,6 +186,10 @@ class UserTest extends TestCase
             ]);
     }
 
+    /**
+     * @test
+     * Test if the store() method validates password format.
+     */
     public function testStoreInvalidPasswordFormat()
     {
         $userData = [
@@ -181,6 +206,10 @@ class UserTest extends TestCase
             ]);
     }
 
+    /**
+     * @test
+     * Test if the store() method validates password confirmation.
+     */
     public function testStoreInvalidPasswordConfirmation()
     {
         $userData = [
@@ -197,6 +226,10 @@ class UserTest extends TestCase
             ]);
     }
 
+    /**
+     * @test
+     * Test that update() method update's user's nickname
+     */
     public function testUpdateWithValidData()
     {
         $user = User::factory()->create();
@@ -221,6 +254,11 @@ class UserTest extends TestCase
         ]);
     }
 
+
+    /**
+     * @test
+     * Test that update() validates nickname is not empty.
+     */
     public function testUpdateEmptyField()
     {
         $user = User::factory()->create();
@@ -246,6 +284,10 @@ class UserTest extends TestCase
         ]);
     }
 
+    /**
+     * @test
+     * Test that update() validates nickname is unique.
+     */
     public function testUpdateDuplicatedNickname()
     {
         $user1 = User::factory()->create();
@@ -264,11 +306,15 @@ class UserTest extends TestCase
             ]);
     }
 
-    public function testIndex()
+    /**
+     * @test
+     * Test that index() method returns all users only for Admin role.
+     */
+    public function testPlayersIndexAdmin()
     {
         $user = User::factory()->create()->assignRole(['Admin']);
         $token = $user->createToken('TestToken')->accessToken;
-        
+
         User::factory()->count(3)->create(['success_rate' => fake()->randomFloat(2, 0, 100)]);
 
         $players = User::count();
@@ -278,5 +324,25 @@ class UserTest extends TestCase
         ])->get('/api/players');
 
         $response->assertStatus(Response::HTTP_OK)->assertJsonCount($players, 'players')->assertJsonStructure(['players']);
+    }
+
+    /**
+     * @test
+     * Test that index() method is forbidden for Player role.
+     */
+    public function testPlayersIndexPlayer()
+    {
+        $user = User::factory()->create()->assignRole(['Player']);
+        $token = $user->createToken('TestToken')->accessToken;
+
+        User::factory()->count(3)->create(['success_rate' => fake()->randomFloat(2, 0, 100)]);
+
+        $players = User::count();
+
+        $response = $this->actingAs($user)->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->get('/api/players');
+
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 }
