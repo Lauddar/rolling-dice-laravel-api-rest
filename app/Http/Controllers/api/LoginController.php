@@ -30,12 +30,25 @@ class LoginController extends Controller
 
         // Authenticate the user with the provided credentials
         if (!Auth::attempt($credentials)) {
-            return response(['message' => 'Invalid login credentials.'], 401);
+            return response(['result' => ['message' => 'Invalid login credentials.'], 'status' => false], 401);
         }
 
         // Generate a new acces token for the user
-        $accesToken = Auth::user()->createToken('authToken')->accessToken;
+        $user = Auth::user();
+        $accessToken = $user->createToken('authToken')->accessToken;
+        $role = $user->roles->first()->name;
 
-        return response(['user' => Auth::user(), 'acces_token' => $accesToken]);
+        return response([
+            'result' => [
+                'user' => [
+                    'id' => $user->id,
+                    'nickname' => $user->nickname,
+                    'email' => $user->email,
+                    'role' => $role,
+                ],
+                'access_token' => $accessToken,
+            ],
+            'status' => true
+        ]);
     }
 }

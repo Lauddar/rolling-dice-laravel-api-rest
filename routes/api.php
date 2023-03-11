@@ -24,6 +24,7 @@ Route::post('/players', [UserController::class, 'store'])->name('register');
 //Player permission routes
 Route::middleware('auth:api')->prefix('players')->group(function () {
     Route::put('/{user}', [UserController::class, 'update']);
+    Route::get('/{user}', [UserController::class, 'getUser']);
     Route::post('/{user}/games', [GameController::class, 'play']);
     Route::delete('/{user}/games', [GameController::class, 'delete']);
     Route::get('/{user}/games', [GameController::class, 'index']);
