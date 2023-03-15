@@ -30,7 +30,7 @@ Route::middleware(['auth:api', 'role:Admin'])->prefix('players')->group(function
 });
 
 //Player permission routes
-Route::middleware(['auth:api', 'cors'])->prefix('players')->group(function () {
+Route::middleware(['auth:api'])->prefix('players')->group(function () {
     Route::put('/{user}', [UserController::class, 'update']);
     Route::get('/{user}', [UserController::class, 'getUser']);
     Route::post('/{user}/games', [GameController::class, 'play']);
