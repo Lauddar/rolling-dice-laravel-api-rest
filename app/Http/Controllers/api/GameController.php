@@ -17,7 +17,7 @@ class GameController extends Controller
      */
     public function index(User $user)
     {
-        return response(['games' => $user->games->all(), 'sucess_rate' => $user->success_rate]);
+        return response(['games' => $user->games->all(), 'success_rate' => $user->success_rate]);
     }
 
 
