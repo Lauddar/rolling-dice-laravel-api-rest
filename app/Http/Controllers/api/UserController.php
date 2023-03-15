@@ -60,7 +60,7 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'success_rate' => 0.00,
-            ]);
+            ])->assignRole(['Player']);
 
             // Response
             return response()->json([
@@ -68,10 +68,12 @@ class UserController extends Controller
                     'message' => 'User created succesfully.',
                     'user' => $user,
                 ],
-                'satatus' => true
+                'status' => true
             ], Response::HTTP_CREATED);
         } catch (ValidationException $e) {
-            return response()->json(['result' => ['message' => $e->getMessage()], 'satatus' => false], Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json([
+                'result' => ['message' => $e->getMessage()], 'status' => false], 
+                Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 

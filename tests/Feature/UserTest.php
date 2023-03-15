@@ -43,8 +43,8 @@ class UserTest extends TestCase
         ]);
 
         $response->assertOk();
-        $response->assertJsonStructure(['user', 'acces_token']);
-        $this->assertNotNull($response['acces_token']);
+        $response->assertJsonStructure(['result' => ['user', 'access_token'], 'status']);
+        $this->assertNotNull($response['result']['access_token']);
     }
 
     /**
@@ -98,11 +98,14 @@ class UserTest extends TestCase
 
         $response->assertStatus(Response::HTTP_CREATED)
             ->assertJson([
-                'message' => 'User created succesfully.',
-                'user' => [
-                    'nickname' => 'Test',
-                    'email' => $userData['email'],
+                'result' => [
+                    'message' => 'User created succesfully.',
+                    'user' => [
+                        'nickname' => 'Test',
+                        'email' => $userData['email'],
+                    ],
                 ],
+                'status' => true
             ]);
 
         $this->assertDatabaseHas('users', [
@@ -130,11 +133,14 @@ class UserTest extends TestCase
 
         $response->assertStatus(Response::HTTP_CREATED)
             ->assertJson([
-                'message' => 'User created succesfully.',
-                'user' => [
-                    'nickname' => 'anonymous',
-                    'email' => $userData['email'],
+                'result' => [
+                    'message' => 'User created succesfully.',
+                    'user' => [
+                        'nickname' => 'anonymous',
+                        'email' => $userData['email'],
+                    ],
                 ],
+                'status' => true
             ]);
 
         $this->assertDatabaseHas('users', [
@@ -162,7 +168,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJson([
-                'message' => 'The email is already in use',
+                'result' => ['message' => 'The email is already in use'], 'status' => false
             ]);
     }
 
@@ -182,7 +188,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJson([
-                'message' => 'The email field must be a valid email address.'
+                'result' => ['message' => 'The email field must be a valid email address.'], 'status' => false
             ]);
     }
 
@@ -202,7 +208,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJson([
-                'message' => 'The password field must be at least 8 characters.'
+                'result' => ['message' => 'The password field must be at least 8 characters.'], 'status' => false
             ]);
     }
 
@@ -222,7 +228,7 @@ class UserTest extends TestCase
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJson([
-                'message' => 'The password confirmation does not match.'
+                'result' => ['message' => 'The password confirmation does not match.'], 'status' => false
             ]);
     }
 
@@ -242,10 +248,13 @@ class UserTest extends TestCase
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJson([
-                'message' => 'Nickname updated succesfully.',
-                'user' => [
-                    'nickname' => $newNickname
-                ]
+                'result' => [
+                    'message' => 'Nickname updated succesfully.',
+                    'user' => [
+                        'nickname' => $newNickname
+                    ],
+                ],
+                'status' => true,
             ]);
 
         $this->assertDatabaseHas('users', [
@@ -268,19 +277,24 @@ class UserTest extends TestCase
 
         $response = $this->actingAs($user)->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->put("/api/players/{$user->id}", ['nickname' => $newNickname]);
+        ])->put("/api/players/{$user->id}", []);
+
+        $response = $response;
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJson([
-                'message' => 'Operation failed.',
-                'user' => [
-                    'nickname' => $oldNickname,
-                ]
+                'result' => [
+                    'message' => 'Nickname updated succesfully.',
+                    'user' => [
+                        'nickname' => 'anonymous',
+                    ],
+                ],
+                'status' => true,
             ]);
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
-            'nickname' => $oldNickname
+            'nickname' => 'anonymous'
         ]);
     }
 
@@ -302,7 +316,10 @@ class UserTest extends TestCase
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJson([
-                'message' => 'Nickname cannot be updated because it is already taken.',
+                'result' => [
+                    'message' => 'Nickname cannot be updated because it is already taken.',
+                ],
+                'status' => false,
             ]);
     }
 

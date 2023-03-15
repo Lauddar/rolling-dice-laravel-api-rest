@@ -28,7 +28,7 @@ class RankController extends Controller
     {
         $loser = User::whereHas('games')->with('games')->orderBy('success_rate')->first();
 
-        return response()->json(['loser' => $loser]);
+        return response()->json(['players' => [$loser]]);
     }
 
     /**
@@ -40,6 +40,6 @@ class RankController extends Controller
     {
         $winner = User::whereHas('games')->with('games')->orderBy('success_rate', 'desc')->first();
 
-        return response()->json(['winner' => $winner]);
+        return response()->json(['players' => [$winner]]);
     }
 }

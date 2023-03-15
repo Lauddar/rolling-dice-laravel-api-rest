@@ -85,7 +85,7 @@ class RankTest extends TestCase
         $response->assertOk();
 
         $response->assertJson([
-            'loser' => $loser->toArray(),
+            'players' => [$loser->toArray()],
         ]);
     }
 
@@ -115,7 +115,7 @@ class RankTest extends TestCase
         $response->assertOk();
 
         $response->assertJson([
-            'winner' => $winner->toArray(),
+            'players' => [$winner->toArray()],
         ]);
     }
 }
