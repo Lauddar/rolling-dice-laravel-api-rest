@@ -35,8 +35,11 @@ class LoginController extends Controller
 
         // Generate a new acces token for the user
         $user = Auth::user();
-        $accessToken = $user->createToken('authToken')->accessToken;
-        $role = $user->roles->first()->name;
+        $accessToken = $user->createToken('authToken');
+        $role = $user->roles->first();
+        if($role) {
+            $role = $role->name;
+        }
 
         return response([
             'result' => [
