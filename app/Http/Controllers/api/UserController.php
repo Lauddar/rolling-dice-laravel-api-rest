@@ -21,6 +21,11 @@ class UserController extends Controller
         return response(['players' => User::all()]);
     }
 
+    public function getUser(User $user)
+    {
+        return response(['user' => User::find($user)]);
+    }
+
     /**
      * Create a new user.
      *
@@ -42,7 +47,7 @@ class UserController extends Controller
             // Check if nickname already exists
             if (isset($request->nickname)) {
                 if (User::where('nickname', $request->nickname)->first()) {
-                    return response()->json(['message' => 'Operation failed. This nickname is already taken.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+                    return response()->json(['result' => ['message' => 'Operation failed. This nickname is already taken.'], 'satatus' => false], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
                 $nickname = $request->nickname;
             } else {
@@ -59,11 +64,14 @@ class UserController extends Controller
 
             // Response
             return response()->json([
-                'message' => 'User created succesfully.',
-                'user' => $user
+                'result' => [
+                    'message' => 'User created succesfully.',
+                    'user' => $user,
+                ],
+                'satatus' => true
             ], Response::HTTP_CREATED);
         } catch (ValidationException $e) {
-            return response()->json(['message' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(['result' => ['message' => $e->getMessage()], 'satatus' => false], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 
@@ -81,9 +89,13 @@ class UserController extends Controller
 
         // Input validation not null.
         if (!isset($nickname)) {
+            $user->update(['nickname' => 'anonymous']);
             return response()->json([
-                'message' => 'Operation failed.',
-                'user' => $user
+                'result' => [
+                    'message' => 'Nickname updated succesfully.',
+                    'user' => $user,
+                ],
+                'status' => true,
             ]);
         }
 
@@ -91,11 +103,20 @@ class UserController extends Controller
         if (!User::where('nickname', $nickname)->first()) {
             $user->update(['nickname' => $nickname]);
             return response()->json([
-                'message' => 'Nickname updated succesfully.',
-                'user' => $user
+                'result' => [
+                    'message' => 'Nickname updated succesfully.',
+                    'user' => $user,
+                ],
+                'status' => true,
             ], Response::HTTP_OK);
         } else {
-            return response()->json(['message' => 'Nickname cannot be updated because it is already taken.']);
+            return response()->json([
+                'result' => [
+                    'message' => 'Nickname cannot be updated because it is already taken.',
+                    'user' => $user,
+                ],
+                'status' => false,
+            ]);
         }
     }
 }
