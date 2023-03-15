@@ -16,15 +16,20 @@ class Rank extends Model
      */
     public static function averageSuccesRate()
     {
-        $succesRates = User::whereHas('games')->with('games')->pluck('success_rate');
-        $averageSuccesRate = 0;
+        $averageSuccessRate = 0;
 
-        foreach ($succesRates as $succesRate) {
-            $averageSuccesRate +=  $succesRate;
+        //Check if there are games in database and calculate average success rate
+        if (Game::exists()) {
+            $succesRates = User::whereHas('games')->with('games')->pluck('success_rate');
+
+
+            foreach ($succesRates as $succesRate) {
+                $averageSuccessRate +=  $succesRate;
+            }
+
+            $averageSuccessRate = number_format($averageSuccessRate / $succesRates->count(), 2, '.', '');
         }
 
-        $averageSuccesRate = number_format($averageSuccesRate / $succesRates->count(), 2, '.', '');
-
-        return $averageSuccesRate;
+        return $averageSuccessRate;
     }
 }
