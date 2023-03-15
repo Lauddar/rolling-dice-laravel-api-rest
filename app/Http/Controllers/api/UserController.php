@@ -54,7 +54,7 @@ class UserController extends Controller
                 'nickname' => $nickname,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'success_rate' => 0.00,
+                'success_rate' => null,
             ]);
 
             // Response
