@@ -1,4 +1,3 @@
-
 <?php
 
 return [
@@ -26,10 +25,17 @@ return [
 
 'allowed_headers' => ['*'],
 
-'exposed_headers' => [],
-
 'max_age' => 0,
 
 'supports_credentials' => false,
+
+'exposedHeaders' => [
+    'Cache-Control' => 'no-cache, no-store, no-store, must-revalidate',
+    'Pragma' => 'no-cache',
+    'Content-Language',
+    'Content-Type',
+    'Expires',
+    'Last-Modified',
+],
 
 ];
