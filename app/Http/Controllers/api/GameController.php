@@ -13,11 +13,11 @@ class GameController extends Controller
      * Get a list of all users' games.
      *
      * @param User $user 
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(User $user)
     {
-        return response(['games' => $user->games->all(), 'success_rate' => $user->success_rate]);
+        return response()->json(['games' => $user->games->all(), 'success_rate' => $user->success_rate]);
     }
 
 
@@ -43,7 +43,7 @@ class GameController extends Controller
             'message' => 'Game created successfully.',
             'game' => $game,
             'success_rate' => $user->success_rate,
-        ], Response::HTTP_CREATED);
+        ]);
     }
 
     /**
@@ -55,7 +55,7 @@ class GameController extends Controller
     public function delete(User $user)
     {
         $user->games()->delete();
-        
+
         $user->updateSuccessRate();
 
         return response()->json([

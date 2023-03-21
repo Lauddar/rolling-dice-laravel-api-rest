@@ -21,9 +21,22 @@ class UserController extends Controller
         return response(['players' => User::all()]);
     }
 
+    /**
+     * Get an specific user.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getUser(User $user)
     {
-        return response(['user' => User::find($user)]);
+        $user = User::find($user);
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'nickname' => $user->nickname,
+                'email' => $user->email
+            ]
+        ]);
     }
 
     /**
@@ -46,10 +59,16 @@ class UserController extends Controller
 
             // Check if nickname already exists
             if (isset($request->nickname)) {
-                if (User::where('nickname', $request->nickname)->first()) {
-                    return response()->json(['result' => ['message' => 'Operation failed. This nickname is already taken.'], 'satatus' => false], Response::HTTP_UNPROCESSABLE_ENTITY);
+                if ($this->validateNickname($request->nickname)) {
+                    $nickname = $request->nickname;
+                } else {
+                    return response()->json([
+                        'result' => [
+                            'message' => 'Operation failed. This nickname is already taken.'
+                        ],
+                        'satatus' => false
+                    ]);
                 }
-                $nickname = $request->nickname;
             } else {
                 $nickname = 'anonymous';
             }
@@ -66,14 +85,29 @@ class UserController extends Controller
             return response()->json([
                 'result' => [
                     'message' => 'User created succesfully.',
-                    'user' => $user,
+                    'user' => [
+                        'id' => $user->id,
+                        'nickname' => $user->nickname,
+                        'email' => $user->email
+                    ],
                 ],
                 'status' => true
-            ], Response::HTTP_CREATED);
+            ]);
         } catch (ValidationException $e) {
-            return response()->json([
-                'result' => ['message' => $e->getMessage()], 'status' => false], 
-                Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(
+                [
+                    'result' => ['message' => $e->getMessage()], 'status' => false
+                ],
+            );
+        }
+    }
+
+    public function validateNickname(String $nickname)
+    {
+        if (User::where('nickname', $nickname)->first()) {
+            return false;
+        } else {
+            return true;
         }
     }
 
@@ -86,6 +120,16 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        // Check if user is authorized for the operation
+        if ($request->user()->id !== $user->id) {
+            return response()->json([
+                'result' => [
+                    'message' => 'Unauthorized.'
+                ],
+                'status' => false,
+            ]);
+        }
+
         // Get the new nickname from the request
         $nickname = $request->input('nickname');
 
