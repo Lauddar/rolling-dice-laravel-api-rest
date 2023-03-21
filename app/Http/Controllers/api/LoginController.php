@@ -49,7 +49,7 @@ class LoginController extends Controller
                     'email' => $user->email,
                     'role' => $role,
                 ],
-                'access_token' => $accessToken,
+                'access_token' => $accessToken->accessToken,
             ],
             'status' => true
         ]);

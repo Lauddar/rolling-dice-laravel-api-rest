@@ -84,12 +84,7 @@ class UserController extends Controller
             // Response
             return response()->json([
                 'result' => [
-                    'message' => 'User created succesfully.',
-                    'user' => [
-                        'id' => $user->id,
-                        'nickname' => $user->nickname,
-                        'email' => $user->email
-                    ],
+                    'message' => 'User created succesfully.'
                 ],
                 'status' => true
             ]);
@@ -120,16 +115,6 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        // Check if user is authorized for the operation
-        if ($request->user()->id !== $user->id) {
-            return response()->json([
-                'result' => [
-                    'message' => 'Unauthorized.'
-                ],
-                'status' => false,
-            ]);
-        }
-
         // Get the new nickname from the request
         $nickname = $request->input('nickname');
 
@@ -151,7 +136,6 @@ class UserController extends Controller
             return response()->json([
                 'result' => [
                     'message' => 'Nickname updated succesfully.',
-                    'user' => $user,
                 ],
                 'status' => true,
             ], Response::HTTP_OK);
@@ -159,7 +143,6 @@ class UserController extends Controller
             return response()->json([
                 'result' => [
                     'message' => 'Nickname cannot be updated because it is already taken.',
-                    'user' => $user,
                 ],
                 'status' => false,
             ]);
