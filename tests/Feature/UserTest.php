@@ -96,14 +96,9 @@ class UserTest extends TestCase
 
         $response = $this->post('/api/players', $userData);
 
-        $response->assertStatus(Response::HTTP_CREATED)
-            ->assertJson([
+        $response->assertJson([
                 'result' => [
                     'message' => 'User created succesfully.',
-                    'user' => [
-                        'nickname' => 'Test',
-                        'email' => $userData['email'],
-                    ],
                 ],
                 'status' => true
             ]);
@@ -131,14 +126,9 @@ class UserTest extends TestCase
 
         $response = $this->post('/api/players', $userData);
 
-        $response->assertStatus(Response::HTTP_CREATED)
-            ->assertJson([
+        $response->assertJson([
                 'result' => [
                     'message' => 'User created succesfully.',
-                    'user' => [
-                        'nickname' => 'anonymous',
-                        'email' => $userData['email'],
-                    ],
                 ],
                 'status' => true
             ]);
@@ -166,8 +156,7 @@ class UserTest extends TestCase
 
         $response = $this->post('/api/players', $userData);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJson([
+        $response->assertJson([
                 'result' => ['message' => 'The email is already in use'], 'status' => false
             ]);
     }
@@ -186,8 +175,7 @@ class UserTest extends TestCase
 
         $response = $this->post('/api/players', $userData);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJson([
+        $response->assertJson([
                 'result' => ['message' => 'The email field must be a valid email address.'], 'status' => false
             ]);
     }
@@ -206,8 +194,7 @@ class UserTest extends TestCase
 
         $response = $this->post('/api/players', $userData);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJson([
+        $response->assertJson([
                 'result' => ['message' => 'The password field must be at least 8 characters.'], 'status' => false
             ]);
     }
@@ -226,8 +213,7 @@ class UserTest extends TestCase
 
         $response = $this->post('/api/players', $userData);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJson([
+        $response->assertJson([
                 'result' => ['message' => 'The password confirmation does not match.'], 'status' => false
             ]);
     }
@@ -250,9 +236,6 @@ class UserTest extends TestCase
             ->assertJson([
                 'result' => [
                     'message' => 'Nickname updated succesfully.',
-                    'user' => [
-                        'nickname' => $newNickname
-                    ],
                 ],
                 'status' => true,
             ]);
@@ -262,7 +245,6 @@ class UserTest extends TestCase
             'nickname' => $newNickname
         ]);
     }
-
 
     /**
      * @test

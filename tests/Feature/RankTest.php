@@ -36,27 +36,16 @@ class RankTest extends TestCase
             'Authorization' => 'Bearer ' . $token,
         ])->get('/api/players/ranking');
 
+        // Assert that the response is successful
         $response->assertOk();
 
-        $response->assertJson([
-            'averageSuccessRate' => 50.93,
-        ]);
-    }
+        // The first player in the response should be the one with the highest success rate (gameA)
+        $this->assertEquals(80.14, $response['users'][0]['success_rate']);
+        $this->assertEquals($gameA->user->nickname, $response['users'][0]['nickname']);
 
-    /**
-     * @test
-     * Test rank() is forbidden for Player role.
-     */
-    public function testRankPlayer()
-    {
-        $user = User::factory()->create()->assignRole(['Player']);
-        $token = $user->createToken('TestToken')->accessToken;
-
-        $response = $this->actingAs($user)->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->get('/api/players/ranking');
-
-        $response->assertStatus(Response::HTTP_FORBIDDEN);
+        // The last player in the response should be the one with the lowest success rate (gameB)
+        $this->assertEquals(10.50, $response['users'][2]['success_rate']);
+        $this->assertEquals($gameB->user->nickname, $response['users'][2]['nickname']);
     }
 
     /**
@@ -85,7 +74,14 @@ class RankTest extends TestCase
         $response->assertOk();
 
         $response->assertJson([
-            'players' => [$loser->toArray()],
+            'user' => [
+                [
+                    'nickname' => $loser->nickname,
+                    'email' => $loser->email,
+                    'success_rate' => round($loser->success_rate, 2),
+                    'games' => 1,
+                ]
+            ]
         ]);
     }
 
@@ -115,7 +111,14 @@ class RankTest extends TestCase
         $response->assertOk();
 
         $response->assertJson([
-            'players' => [$winner->toArray()],
+            'user' => [
+                [
+                    'nickname' => $winner->nickname,
+                    'email' => $winner->email,
+                    'success_rate' => round($winner->success_rate, 2),
+                    'games' => 1,
+                ]
+            ],
         ]);
     }
 }

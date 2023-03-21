@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\DTO\UserDTO;
 use App\Models\Rank;
 use App\Models\User;
 
@@ -15,8 +16,21 @@ class RankController extends Controller
      */
     public function rank()
     {
+        $users = $this->getRank();
+
+        $userData = [];
+        foreach ($users as $user) {
+            $userData[] = [
+                'nickname' => $user->nickname,
+                'email' => $user->email,
+                'success_rate' => $user->success_rate,
+                'games' => $user->games()->count(),
+            ];
+        }
+
         $rank = new Rank;
-        return response()->json(['averageSuccessRate' => $rank->averageSuccesRate()]);
+
+        return response()->json(['users' => $userData, 'averageSuccessRate' => $rank->averageSuccesRate()]);
     }
 
     /**
@@ -26,9 +40,11 @@ class RankController extends Controller
      */
     public function loser()
     {
-        $loser = User::whereHas('games')->with('games')->orderBy('success_rate')->first();
+        $loser = $this->getRank()->last();
 
-        return response()->json(['players' => [$loser]]);
+        $games = $loser->games()->count();
+
+        return response()->json(['user' => [['email' => $loser->email, 'nickname' => $loser->nickname, 'success_rate' => $loser->success_rate, 'games' => $games]]]);
     }
 
     /**
@@ -38,8 +54,26 @@ class RankController extends Controller
      */
     public function winner()
     {
-        $winner = User::whereHas('games')->with('games')->orderBy('success_rate', 'desc')->first();
+        $winner = $this->getRank()->first();
 
-        return response()->json(['players' => [$winner]]);
+        $games = $winner->games()->count();
+
+        return response()->json(['user' => [['email' => $winner->email, 'nickname' => $winner->nickname, 'success_rate' => $winner->success_rate, 'games' => $games]]]);
+    }
+
+    /**
+     * Returns the rank of users based on their success rate and number of games played
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|\App\Models\User[]
+     */
+    private function getRank()
+    {
+        $rank = User::whereHas('games')
+            ->withCount('games')
+            ->with('games')
+            ->orderByDesc('success_rate')
+            ->orderByDesc('games_count')
+            ->get();
+        return $rank;
     }
 }

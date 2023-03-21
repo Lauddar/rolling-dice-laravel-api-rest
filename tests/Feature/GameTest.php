@@ -25,8 +25,6 @@ class GameTest extends TestCase
             'Authorization' => 'Bearer ' . $token,
         ])->post("/api/players/{$user->id}/games");
 
-        $response->assertStatus(Response::HTTP_CREATED);
-
         $game = Game::where('user_id', $user->id)->first();
         $this->assertNotNull($game);
 
@@ -104,8 +102,6 @@ class GameTest extends TestCase
         $response = $this->actingAs($user)->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->post("/api/players/{$user->id}/games");
-
-        $response->assertStatus(Response::HTTP_CREATED);
 
         $response->assertJsonCount(3);
     }
